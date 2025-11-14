@@ -6,16 +6,16 @@ export default function Home() {
     return (
         <main className="min-h-screen flex flex-col">
             {/* Navigation */}
-            <nav className="w-full border-b border-b-foreground/10">
-                <div className="max-w-6xl mx-auto flex justify-between items-center p-4 px-6">
-                    <Link href="/" className="text-2xl font-bold tracking-tight">
+            <nav className="w-full border-b">
+                <div className="max-w-5xl mx-auto flex justify-between items-center p-4 px-6">
+                    <Link href="/" className="text-xl font-semibold">
                         WindDown
                     </Link>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
                         <ThemeSwitcher />
                         <Link href="/auth/login">
-                            <Button variant="outline" size="sm">
-                                Login
+                            <Button variant="ghost" size="sm">
+                                Sign In
                             </Button>
                         </Link>
                     </div>
@@ -24,27 +24,19 @@ export default function Home() {
 
             {/* Hero Section */}
             <div className="flex-1 flex items-center justify-center px-6">
-                <div className="max-w-3xl text-center space-y-8">
-                    <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
-                        Manage your tasks.
-                        <br />
-                        <span className="text-muted-foreground">Wind down your day.</span>
+                <div className="max-w-2xl text-center space-y-6">
+                    <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
+                        Simple task management
                     </h1>
                     
-                    <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-                        A simple, minimalistic task manager that helps you organize your work 
-                        and end your day with clarity.
+                    <p className="text-base md:text-lg text-muted-foreground">
+                        Organize your tasks. Wind down your day.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                        <Link href="/auth/sign-up">
-                            <Button size="lg" className="w-full sm:w-auto">
-                                Get Started
-                            </Button>
-                        </Link>
+                    <div className="pt-2">
                         <Link href="/auth/login">
-                            <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                                Sign In
+                            <Button size="lg">
+                                Get Started
                             </Button>
                         </Link>
                     </div>
@@ -52,9 +44,9 @@ export default function Home() {
             </div>
 
             {/* Footer */}
-            <footer className="w-full border-t py-6">
-                <div className="max-w-6xl mx-auto px-6 text-center text-sm text-muted-foreground">
-                    <p>&copy; 2025 WindDown. Simple task management.</p>
+            <footer className="w-full border-t py-4">
+                <div className="max-w-5xl mx-auto px-6 text-center text-xs text-muted-foreground">
+                    <p>&copy; 2025 WindDown</p>
                 </div>
             </footer>
         </main>
