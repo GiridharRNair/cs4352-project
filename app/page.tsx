@@ -1,55 +1,62 @@
-import { DeployButton } from "@/components/deploy-button";
-import { EnvVarWarning } from "@/components/env-var-warning";
-import { AuthButton } from "@/components/auth-button";
-import { Hero } from "@/components/hero";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import { ConnectSupabaseSteps } from "@/components/tutorial/connect-supabase-steps";
-import { SignUpUserSteps } from "@/components/tutorial/sign-up-user-steps";
-import { hasEnvVars } from "@/lib/utils";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
     return (
-        <main className="min-h-screen flex flex-col items-center">
-            <div className="flex-1 w-full flex flex-col gap-20 items-center">
-                <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-                    <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
-                        <div className="flex gap-5 items-center font-semibold">
-                            <Link href={"/"}>Next.js Supabase Starter</Link>
-                            <div className="flex items-center gap-2">
-                                <DeployButton />
-                            </div>
-                        </div>
-                        {!hasEnvVars ? <EnvVarWarning /> : <AuthButton />}
+        <main className="min-h-screen flex flex-col">
+            {/* Navigation */}
+            <nav className="w-full border-b border-b-foreground/10">
+                <div className="max-w-6xl mx-auto flex justify-between items-center p-4 px-6">
+                    <Link href="/" className="text-2xl font-bold tracking-tight">
+                        WindDown
+                    </Link>
+                    <div className="flex items-center gap-4">
+                        <ThemeSwitcher />
+                        <Link href="/auth/login">
+                            <Button variant="outline" size="sm">
+                                Login
+                            </Button>
+                        </Link>
                     </div>
-                </nav>
-                <div className="flex-1 flex flex-col gap-20 max-w-5xl p-5">
-                    <Hero />
-                    <main className="flex-1 flex flex-col gap-6 px-4">
-                        <h2 className="font-medium text-xl mb-4">Next steps</h2>
-                        {hasEnvVars ? (
-                            <SignUpUserSteps />
-                        ) : (
-                            <ConnectSupabaseSteps />
-                        )}
-                    </main>
                 </div>
+            </nav>
 
-                <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
-                    <p>
-                        Powered by{" "}
-                        <a
-                            href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-                            target="_blank"
-                            className="font-bold hover:underline"
-                            rel="noreferrer"
-                        >
-                            Supabase
-                        </a>
+            {/* Hero Section */}
+            <div className="flex-1 flex items-center justify-center px-6">
+                <div className="max-w-3xl text-center space-y-8">
+                    <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
+                        Manage your tasks.
+                        <br />
+                        <span className="text-muted-foreground">Wind down your day.</span>
+                    </h1>
+                    
+                    <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+                        A simple, minimalistic task manager that helps you organize your work 
+                        and end your day with clarity.
                     </p>
-                    <ThemeSwitcher />
-                </footer>
+
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                        <Link href="/auth/sign-up">
+                            <Button size="lg" className="w-full sm:w-auto">
+                                Get Started
+                            </Button>
+                        </Link>
+                        <Link href="/auth/login">
+                            <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                                Sign In
+                            </Button>
+                        </Link>
+                    </div>
+                </div>
             </div>
+
+            {/* Footer */}
+            <footer className="w-full border-t py-6">
+                <div className="max-w-6xl mx-auto px-6 text-center text-sm text-muted-foreground">
+                    <p>&copy; 2025 WindDown. Simple task management.</p>
+                </div>
+            </footer>
         </main>
     );
 }
