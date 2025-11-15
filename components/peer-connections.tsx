@@ -99,30 +99,47 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
             // Find user by PIN
             const { data: targetUser, error: findError } = await supabase
                 .from("profiles")
-                .select("id")
+                .select("id, email, full_name")
                 .eq("user_pin", pin)
-                .single();
+                .maybeSingle();
 
-            if (findError || !targetUser) {
-                setError("User not found with this PIN");
+            if (findError) {
+                console.error("Error finding user:", findError);
+                setError("Error searching for user. Please try again.");
+                setIsLoading(false);
+                return;
+            }
+
+            if (!targetUser) {
+                setError("User not found with this PIN. Please check the PIN and try again.");
+                setIsLoading(false);
                 return;
             }
 
             if (targetUser.id === userId) {
                 setError("You cannot connect with yourself");
+                setIsLoading(false);
                 return;
             }
 
             // Check if connection already exists
             const { data: existing } = await supabase
                 .from("connections")
-                .select("id")
+                .select("id, status")
                 .or(
                     `and(user_id.eq.${userId},connected_user_id.eq.${targetUser.id}),and(user_id.eq.${targetUser.id},connected_user_id.eq.${userId})`,
                 );
 
             if (existing && existing.length > 0) {
-                setError("Connection already exists");
+                const existingConnection = existing[0];
+                if (existingConnection.status === "pending") {
+                    setError("Connection request already pending");
+                } else if (existingConnection.status === "accepted") {
+                    setError("You are already connected with this user");
+                } else {
+                    setError("Connection already exists");
+                }
+                setIsLoading(false);
                 return;
             }
 
@@ -135,14 +152,17 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
                     status: "pending",
                 });
 
-            if (insertError) throw insertError;
+            if (insertError) {
+                console.error("Error creating connection:", insertError);
+                throw insertError;
+            }
 
             setPin("");
-            alert("Connection request sent!");
+            alert(`Connection request sent to ${targetUser.full_name || targetUser.email}!`);
             router.refresh();
         } catch (error) {
             console.error("Error connecting:", error);
-            setError("Failed to send connection request");
+            setError("Failed to send connection request. Please try again.");
         } finally {
             setIsLoading(false);
         }

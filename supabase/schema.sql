@@ -69,6 +69,10 @@ create policy "Users can update their own profile"
   on profiles for update
   using (auth.uid() = id);
 
+create policy "Users can search profiles by PIN"
+  on profiles for select
+  using (true);
+
 create policy "Users can view connected profiles"
   on profiles for select
   using (
