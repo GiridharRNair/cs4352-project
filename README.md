@@ -3,6 +3,8 @@ WindDown - Task Management Application
 What is WindDown?
 A web app that helps you reduce screen time and stay productive by organizing tasks and connecting with peers for accountability.
 
+Demo Video: https://youtu.be/ADTnJb7PrOs
+
 UI Features:
 
 Landing Page
