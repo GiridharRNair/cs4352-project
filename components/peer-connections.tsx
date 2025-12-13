@@ -213,6 +213,32 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
 
     return (
         <div className="space-y-6">
+            {/* Info Banner */}
+            <Card className="bg-muted/50 border-primary/20">
+                <CardContent className="p-4">
+                    <div className="flex gap-3">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 text-primary flex-shrink-0 mt-0.5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                        >
+                            <path
+                                fillRule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                clipRule="evenodd"
+                            />
+                        </svg>
+                        <div className="text-sm">
+                            <p className="font-medium mb-1">About Peer Connections</p>
+                            <p className="text-muted-foreground">
+                                Connect with friends using their 6-digit PIN to view each other's task completion progress and streaks. Stay motivated together!
+                            </p>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
             {/* Connect by PIN */}
             <Card>
                 <CardHeader>

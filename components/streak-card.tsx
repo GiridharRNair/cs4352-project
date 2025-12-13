@@ -1,6 +1,12 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useEffect, useState } from "react";
 
 interface StreakCardProps {
@@ -36,11 +42,14 @@ export function StreakCard({ currentStreak, longestStreak }: StreakCardProps) {
     }, []);
 
     return (
-        <div className="grid grid-cols-3 gap-3">
-            {/* Current Streak */}
-            <Card>
-                <CardContent className="p-4">
-                    <div className="flex flex-col items-center text-center gap-2">
+        <TooltipProvider>
+            <div className="grid grid-cols-3 gap-3">
+                {/* Current Streak */}
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Card className="cursor-help">
+                            <CardContent className="p-4">
+                                <div className="flex flex-col items-center text-center gap-2">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-5 w-5 text-orange-500"
@@ -54,17 +63,24 @@ export function StreakCard({ currentStreak, longestStreak }: StreakCardProps) {
                             />
                         </svg>
                         <div className="text-2xl font-bold">{currentStreak}</div>
-                        <div className="text-xs text-muted-foreground">
-                            day streak
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+                                    <div className="text-xs text-muted-foreground">
+                                        day streak
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Complete at least one task daily to maintain your streak</p>
+                    </TooltipContent>
+                </Tooltip>
 
-            {/* Longest Streak */}
-            <Card>
-                <CardContent className="p-4">
-                    <div className="flex flex-col items-center text-center gap-2">
+                {/* Longest Streak */}
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Card className="cursor-help">
+                            <CardContent className="p-4">
+                                <div className="flex flex-col items-center text-center gap-2">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-5 w-5 text-yellow-500"
@@ -74,17 +90,24 @@ export function StreakCard({ currentStreak, longestStreak }: StreakCardProps) {
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
                         <div className="text-2xl font-bold">{longestStreak}</div>
-                        <div className="text-xs text-muted-foreground">
-                            best streak
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+                                    <div className="text-xs text-muted-foreground">
+                                        best streak
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Your longest consecutive streak of completing tasks</p>
+                    </TooltipContent>
+                </Tooltip>
 
-            {/* Countdown */}
-            <Card>
-                <CardContent className="p-4">
-                    <div className="flex flex-col items-center text-center gap-2">
+                {/* Countdown */}
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Card className="cursor-help">
+                            <CardContent className="p-4">
+                                <div className="flex flex-col items-center text-center gap-2">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-5 w-5 text-primary"
@@ -100,12 +123,18 @@ export function StreakCard({ currentStreak, longestStreak }: StreakCardProps) {
                         <div className="text-xl font-mono font-bold">
                             {timeUntilReset}
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                            until reset
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
+                                    <div className="text-xs text-muted-foreground">
+                                        until reset
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Time remaining to complete a task today and keep your streak alive</p>
+                    </TooltipContent>
+                </Tooltip>
+            </div>
+        </TooltipProvider>
     );
 }
