@@ -19,6 +19,7 @@ export type Task = {
     completed: boolean;
     completed_at: string | null;
     due_date: string | null;
+    total_focus_time_minutes: number;
     created_at: string;
     updated_at: string;
 };
@@ -47,4 +48,39 @@ export type ConnectionWithProfile = Connection & {
 
 export type TaskWithUser = Task & {
     user: Profile;
+};
+
+export type FocusSession = {
+    id: string;
+    user_id: string;
+    task_id: string | null;
+    duration_minutes: number;
+    completed_minutes: number;
+    session_type: "focus" | "break";
+    completed: boolean;
+    started_at: string;
+    completed_at: string | null;
+    created_at: string;
+};
+
+export type PeerReaction = {
+    id: string;
+    from_user_id: string;
+    to_user_id: string;
+    task_id: string | null;
+    reaction_type: string;
+    created_at: string;
+};
+
+export type ActivityFeed = {
+    id: string;
+    user_id: string;
+    activity_type: "task_completed" | "streak_milestone" | "task_created";
+    task_id: string | null;
+    metadata: Record<string, unknown> | null;
+    created_at: string;
+};
+
+export type ActivityFeedWithProfile = ActivityFeed & {
+    profile: Profile;
 };

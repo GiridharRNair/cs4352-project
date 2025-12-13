@@ -14,6 +14,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import { FocusTimer } from "@/components/focus-timer";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import type { Task } from "@/lib/types/database";
@@ -30,6 +31,7 @@ export function TaskList({ tasks }: TaskListProps) {
     const [deleteConfirmTask, setDeleteConfirmTask] = useState<Task | null>(null);
     const [undoTask, setUndoTask] = useState<Task | null>(null);
     const [undoTimeout, setUndoTimeout] = useState<NodeJS.Timeout | null>(null);
+    const [focusTask, setFocusTask] = useState<Task | null>(null);
     const router = useRouter();
 
     const handleToggleComplete = async (task: Task) => {
@@ -214,8 +216,47 @@ export function TaskList({ tasks }: TaskListProps) {
                                                     {task.description}
                                                 </p>
                                             )}
+                                            {task.total_focus_time_minutes > 0 && (
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        className="h-3 w-3 inline mr-1"
+                                                        viewBox="0 0 20 20"
+                                                        fill="currentColor"
+                                                    >
+                                                        <path
+                                                            fillRule="evenodd"
+                                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                                                            clipRule="evenodd"
+                                                        />
+                                                    </svg>
+                                                    {Math.floor(task.total_focus_time_minutes / 60)}h{" "}
+                                                    {task.total_focus_time_minutes % 60}m focused
+                                                </p>
+                                            )}
                                         </div>
                                         <div className="flex gap-1">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setFocusTask(task)}
+                                                disabled={loadingTaskId === task.id}
+                                                title="Start focus timer"
+                                                className="text-primary hover:text-primary"
+                                            >
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    className="h-4 w-4"
+                                                    viewBox="0 0 20 20"
+                                                    fill="currentColor"
+                                                >
+                                                    <path
+                                                        fillRule="evenodd"
+                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                                                        clipRule="evenodd"
+                                                    />
+                                                </svg>
+                                            </Button>
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
@@ -374,7 +415,7 @@ export function TaskList({ tasks }: TaskListProps) {
                     <DialogHeader>
                         <DialogTitle>Delete Task</DialogTitle>
                         <DialogDescription>
-                            Are you sure you want to delete "{deleteConfirmTask?.title}"? You can undo this action within 5 seconds.
+                            Are you sure you want to delete &quot;{deleteConfirmTask?.title}&quot;? You can undo this action within 5 seconds.
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
@@ -400,7 +441,7 @@ export function TaskList({ tasks }: TaskListProps) {
                     <Card className="shadow-lg">
                         <CardContent className="p-4 flex items-center gap-3">
                             <p className="text-sm">
-                                Task "{undoTask.title}" deleted
+                                Task &quot;{undoTask.title}&quot; deleted
                             </p>
                             <Button
                                 size="sm"
@@ -433,6 +474,15 @@ export function TaskList({ tasks }: TaskListProps) {
                         </CardContent>
                     </Card>
                 </div>
+            )}
+
+            {/* Focus Timer */}
+            {focusTask && (
+                <FocusTimer
+                    task={focusTask}
+                    open={!!focusTask}
+                    onOpenChange={(open) => !open && setFocusTask(null)}
+                />
             )}
         </div>
     );

@@ -30,6 +30,7 @@ export function AddTaskForm({ userId }: AddTaskFormProps) {
                 title: title.trim(),
                 description: description.trim() || null,
                 due_date: new Date().toISOString().split("T")[0], // Today's date
+                total_focus_time_minutes: 0,
             });
 
             if (error) throw error;
