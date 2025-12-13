@@ -41,17 +41,26 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
     const fetchConnections = async () => {
         const supabase = createClient();
 
-        // Get accepted connections
-        const { data: connectionsData } = await supabase
+        // Get connections where user is the sender
+        const { data: sentConnections } = await supabase
             .from("connections")
             .select("*, profile:profiles!connections_connected_user_id_fkey(*)")
             .eq("user_id", userId)
             .eq("status", "accepted");
 
-        if (connectionsData) {
-            // Fetch tasks for each connected user
-            const connectionsWithTasks = await Promise.all(
-                connectionsData.map(async (conn: any) => {
+        // Get connections where user is the receiver
+        const { data: receivedConnections } = await supabase
+            .from("connections")
+            .select("*, profile:profiles!connections_user_id_fkey(*)")
+            .eq("connected_user_id", userId)
+            .eq("status", "accepted");
+
+        const allConnections = [];
+
+        // Process sent connections
+        if (sentConnections) {
+            const sentWithTasks = await Promise.all(
+                sentConnections.map(async (conn) => {
                     const { data: tasks } = await supabase
                         .from("tasks")
                         .select("*")
@@ -64,9 +73,33 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
                     };
                 }),
             );
-
-            setConnections(connectionsWithTasks);
+            allConnections.push(...sentWithTasks);
         }
+
+        // Process received connections
+        if (receivedConnections) {
+            const receivedWithTasks = await Promise.all(
+                receivedConnections.map(async (conn) => {
+                    const { data: tasks } = await supabase
+                        .from("tasks")
+                        .select("*")
+                        .eq("user_id", conn.user_id)
+                        .order("created_at", { ascending: false });
+
+                    return {
+                        id: conn.id,
+                        user_id: conn.connected_user_id, // swap for consistency
+                        connected_user_id: conn.user_id,
+                        status: conn.status,
+                        profile: conn.profile,
+                        tasks: tasks || [],
+                    };
+                }),
+            );
+            allConnections.push(...receivedWithTasks);
+        }
+
+        setConnections(allConnections as ConnectionWithDetails[]);
     };
 
     const fetchPendingRequests = async () => {
@@ -80,7 +113,7 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
             .eq("status", "pending");
 
         if (data) {
-            setPendingRequests(data as any);
+            setPendingRequests(data as ConnectionWithDetails[]);
         }
     };
 

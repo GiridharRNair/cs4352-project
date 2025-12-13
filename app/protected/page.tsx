@@ -4,6 +4,10 @@ import { StreakCard } from "@/components/streak-card";
 import { TaskList } from "@/components/task-list";
 import { AddTaskForm } from "@/components/add-task-form";
 import { PeerConnections } from "@/components/peer-connections";
+import { PeerActivityFeed } from "@/components/peer-activity-feed";
+import { PeerStreaks } from "@/components/peer-streaks";
+import { DailyReflectionForm } from "@/components/daily-reflection-form";
+import { PeerReflections } from "@/components/peer-reflections";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 
@@ -51,7 +55,7 @@ export default async function ProtectedPage() {
                         </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                        Share this PIN with others to connect and view each other's progress
+                        Share this PIN with others to connect and view each other&apos;s progress
                     </p>
                 </div>
                 <StreakCard
@@ -62,7 +66,7 @@ export default async function ProtectedPage() {
 
             {/* Main Content */}
             <Tabs defaultValue="tasks" className="w-full">
-                <TabsList className="grid w-full max-w-md grid-cols-2">
+                <TabsList className="grid w-full max-w-2xl grid-cols-3">
                     <TabsTrigger value="tasks">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -86,6 +90,17 @@ export default async function ProtectedPage() {
                         </svg>
                         Peers
                     </TabsTrigger>
+                    <TabsTrigger value="reflect">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4 mr-2"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                        >
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                        </svg>
+                        Wind Down
+                    </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="tasks" className="space-y-6">
@@ -93,8 +108,20 @@ export default async function ProtectedPage() {
                     <TaskList tasks={tasks || []} />
                 </TabsContent>
 
-                <TabsContent value="peers">
+                <TabsContent value="peers" className="space-y-6">
+                    <PeerStreaks 
+                        userId={user.id} 
+                        currentUserStreak={profile?.current_streak || 0}
+                    />
+                    <PeerActivityFeed userId={user.id} />
                     <PeerConnections userId={user.id} />
+                </TabsContent>
+
+                <TabsContent value="reflect" className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <DailyReflectionForm userId={user.id} />
+                        <PeerReflections userId={user.id} />
+                    </div>
                 </TabsContent>
             </Tabs>
         </div>

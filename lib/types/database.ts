@@ -84,3 +84,20 @@ export type ActivityFeed = {
 export type ActivityFeedWithProfile = ActivityFeed & {
     profile: Profile;
 };
+
+export type DailyReflection = {
+    id: string;
+    user_id: string;
+    reflection_date: string;
+    mood: "happy" | "neutral" | "sad";
+    gratitude_note: string | null;
+    reflection_note: string | null;
+    tasks_completed_count: number;
+    is_shared_with_peers: boolean;
+    created_at: string;
+    updated_at: string;
+};
+
+export type DailyReflectionWithProfile = DailyReflection & {
+    profile: Profile;
+};

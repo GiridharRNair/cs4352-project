@@ -5,7 +5,6 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
@@ -47,6 +46,7 @@ export function FocusTimer({ task, open, onOpenChange }: FocusTimerProps) {
         if (!open) {
             handleStop();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open]);
 
     useEffect(() => {
@@ -70,6 +70,7 @@ export function FocusTimer({ task, open, onOpenChange }: FocusTimerProps) {
                 clearInterval(intervalRef.current);
             }
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isRunning, timeLeft]);
 
     const handleStart = async () => {
