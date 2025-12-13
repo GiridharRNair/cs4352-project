@@ -5,6 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import type { Profile, Task } from "@/lib/types/database";
@@ -26,6 +34,10 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
     const [pin, setPin] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [processingRequestId, setProcessingRequestId] = useState<string | null>(null);
+    const [removingConnectionId, setRemovingConnectionId] = useState<string | null>(null);
+    const [confirmRemoveConnection, setConfirmRemoveConnection] = useState<ConnectionWithDetails | null>(null);
     const [connections, setConnections] = useState<ConnectionWithDetails[]>([]);
     const [pendingRequests, setPendingRequests] = useState<
         ConnectionWithDetails[]
@@ -126,6 +138,7 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
 
         setIsLoading(true);
         setError(null);
+        setSuccessMessage(null);
 
         try {
             const supabase = createClient();
@@ -192,7 +205,8 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
             }
 
             setPin("");
-            alert(`Connection request sent to ${targetUser.full_name || targetUser.email}!`);
+            setSuccessMessage(`Connection request sent to ${targetUser.full_name || targetUser.email}!`);
+            setTimeout(() => setSuccessMessage(null), 3000);
             router.refresh();
         } catch (error) {
             console.error("Error connecting:", error);
@@ -203,7 +217,7 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
     };
 
     const handleAcceptRequest = async (connectionId: string) => {
-        setIsLoading(true);
+        setProcessingRequestId(connectionId);
 
         try {
             const supabase = createClient();
@@ -214,18 +228,21 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
 
             if (error) throw error;
 
+            setSuccessMessage("Connection accepted!");
+            setTimeout(() => setSuccessMessage(null), 3000);
             await fetchConnections();
             await fetchPendingRequests();
             router.refresh();
         } catch (error) {
             console.error("Error accepting request:", error);
+            setError("Failed to accept request. Please try again.");
         } finally {
-            setIsLoading(false);
+            setProcessingRequestId(null);
         }
     };
 
     const handleRejectRequest = async (connectionId: string) => {
-        setIsLoading(true);
+        setProcessingRequestId(connectionId);
 
         try {
             const supabase = createClient();
@@ -240,8 +257,63 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
             router.refresh();
         } catch (error) {
             console.error("Error rejecting request:", error);
+            setError("Failed to reject request. Please try again.");
         } finally {
-            setIsLoading(false);
+            setProcessingRequestId(null);
+        }
+    };
+
+    const handleRemovePeer = async (connectionId: string) => {
+        console.log("Attempting to remove peer connection:", connectionId);
+        setRemovingConnectionId(connectionId);
+        setConfirmRemoveConnection(null);
+
+        try {
+            const supabase = createClient();
+            
+            // First, get the connection to know both user IDs
+            const { data: connectionData, error: fetchError } = await supabase
+                .from("connections")
+                .select("*")
+                .eq("id", connectionId)
+                .single();
+
+            if (fetchError) {
+                console.error("Error fetching connection:", fetchError);
+                throw fetchError;
+            }
+
+            console.log("Connection to remove:", connectionData);
+
+            // Delete the connection - try to match in both directions
+            const { error: deleteError } = await supabase
+                .from("connections")
+                .delete()
+                .or(`id.eq.${connectionId},and(user_id.eq.${connectionData.connected_user_id},connected_user_id.eq.${connectionData.user_id})`);
+
+            if (deleteError) {
+                console.error("Database error removing peer:", deleteError);
+                throw deleteError;
+            }
+
+            console.log("Peer removed successfully from database");
+            setSuccessMessage("Peer connection removed");
+            setTimeout(() => setSuccessMessage(null), 3000);
+            
+            // Immediately update local state to remove the connection
+            setConnections(prevConnections => 
+                prevConnections.filter(conn => conn.id !== connectionId)
+            );
+            
+            // Refresh data from server
+            await fetchConnections();
+            router.refresh();
+        } catch (error) {
+            console.error("Error removing peer:", error);
+            setError("Failed to remove peer. Please try again.");
+            setTimeout(() => setError(null), 3000);
+        } finally {
+            setRemovingConnectionId(null);
         }
     };
 
@@ -298,12 +370,23 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
                         {error && (
                             <p className="text-sm text-red-500">{error}</p>
                         )}
+                        {successMessage && (
+                            <p className="text-sm text-green-600 bg-green-50 dark:bg-green-950 p-2 rounded">{successMessage}</p>
+                        )}
                         <Button
                             type="submit"
                             disabled={isLoading || pin.length !== 6}
                             className="w-full"
                         >
-                            {isLoading ? "Connecting..." : "Send Request"}
+                            {isLoading ? (
+                                <>
+                                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Sending...
+                                </>
+                            ) : "Send Request"}
                         </Button>
                     </form>
                 </CardContent>
@@ -338,9 +421,17 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
                                         onClick={() =>
                                             handleAcceptRequest(request.id)
                                         }
-                                        disabled={isLoading}
+                                        disabled={processingRequestId === request.id}
                                     >
-                                        Accept
+                                        {processingRequestId === request.id ? (
+                                            <>
+                                                <svg className="animate-spin -ml-1 mr-2 h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                Accepting...
+                                            </>
+                                        ) : "Accept"}
                                     </Button>
                                     <Button
                                         size="sm"
@@ -348,9 +439,9 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
                                         onClick={() =>
                                             handleRejectRequest(request.id)
                                         }
-                                        disabled={isLoading}
+                                        disabled={processingRequestId === request.id}
                                     >
-                                        Decline
+                                        {processingRequestId === request.id ? "Declining..." : "Decline"}
                                     </Button>
                                 </div>
                             </div>
@@ -424,6 +515,27 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
                                                 </Badge>
                                             </div>
                                         </div>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => setConfirmRemoveConnection(connection)}
+                                            disabled={removingConnectionId === connection.id}
+                                            title="Remove peer"
+                                            className="text-muted-foreground hover:text-destructive"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="h-4 w-4"
+                                                viewBox="0 0 20 20"
+                                                fill="currentColor"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                                    clipRule="evenodd"
+                                                />
+                                            </svg>
+                                        </Button>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -456,6 +568,42 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
                     </CardContent>
                 </Card>
             )}
+
+            {/* Remove Peer Confirmation Dialog */}
+            <Dialog open={!!confirmRemoveConnection} onOpenChange={(open) => !open && setConfirmRemoveConnection(null)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Remove Peer Connection</DialogTitle>
+                        <DialogDescription>
+                            Are you sure you want to remove {confirmRemoveConnection?.profile.full_name || confirmRemoveConnection?.profile.email} from your peer connections? This action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => setConfirmRemoveConnection(null)}
+                            disabled={removingConnectionId === confirmRemoveConnection?.id}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={() => confirmRemoveConnection && handleRemovePeer(confirmRemoveConnection.id)}
+                            disabled={removingConnectionId === confirmRemoveConnection?.id}
+                        >
+                            {removingConnectionId === confirmRemoveConnection?.id ? (
+                                <>
+                                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Removing...
+                                </>
+                            ) : "Remove Peer"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
