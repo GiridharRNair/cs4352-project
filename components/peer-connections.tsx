@@ -38,6 +38,7 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
     const [processingRequestId, setProcessingRequestId] = useState<string | null>(null);
     const [removingConnectionId, setRemovingConnectionId] = useState<string | null>(null);
     const [confirmRemoveConnection, setConfirmRemoveConnection] = useState<ConnectionWithDetails | null>(null);
+    const [expandedPeerId, setExpandedPeerId] = useState<string | null>(null);
     const [connections, setConnections] = useState<ConnectionWithDetails[]>([]);
     const [pendingRequests, setPendingRequests] = useState<
         ConnectionWithDetails[]
@@ -514,6 +515,102 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
                                                     {completedToday}/{totalToday} tasks today
                                                 </Badge>
                                             </div>
+
+                                            {/* View Tasks Button */}
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => setExpandedPeerId(expandedPeerId === connection.id ? null : connection.id)}
+                                                className="mt-2"
+                                            >
+                                                {expandedPeerId === connection.id ? (
+                                                    <>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
+                                                        </svg>
+                                                        Hide Tasks
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                        </svg>
+                                                        View Tasks ({connection.tasks?.length || 0})
+                                                    </>
+                                                )}
+                                            </Button>
+
+                                            {/* Expandable Tasks List */}
+                                            {expandedPeerId === connection.id && connection.tasks && connection.tasks.length > 0 && (
+                                                <div className="mt-4 space-y-2 border-t pt-4">
+                                                    <h4 className="text-sm font-semibold text-muted-foreground mb-2">Tasks</h4>
+                                                    {connection.tasks.map((task) => (
+                                                        <div
+                                                            key={task.id}
+                                                            className={`p-3 rounded-lg border ${
+                                                                task.completed ? "bg-muted/50 opacity-75" : "bg-background"
+                                                            }`}
+                                                        >
+                                                            <div className="flex items-start gap-3">
+                                                                <div className="mt-1">
+                                                                    {task.completed ? (
+                                                                        <svg
+                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                            className="h-5 w-5 text-green-500"
+                                                                            viewBox="0 0 20 20"
+                                                                            fill="currentColor"
+                                                                        >
+                                                                            <path
+                                                                                fillRule="evenodd"
+                                                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                                                                clipRule="evenodd"
+                                                                            />
+                                                                        </svg>
+                                                                    ) : (
+                                                                        <div className="h-5 w-5 rounded-full border-2 border-muted-foreground"></div>
+                                                                    )}
+                                                                </div>
+                                                                <div className="flex-1 min-w-0">
+                                                                    <p className={`font-medium ${
+                                                                        task.completed ? "line-through text-muted-foreground" : ""
+                                                                    }`}>
+                                                                        {task.title}
+                                                                    </p>
+                                                                    {task.description && (
+                                                                        <p className="text-sm text-muted-foreground mt-1">
+                                                                            {task.description}
+                                                                        </p>
+                                                                    )}
+                                                                    <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                                                                        {task.due_date && (
+                                                                            <span className="flex items-center gap-1">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                                                                    <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                                                                                </svg>
+                                                                                {new Date(task.due_date).toLocaleDateString()}
+                                                                            </span>
+                                                                        )}
+                                                                        {task.total_focus_time_minutes > 0 && (
+                                                                            <span className="flex items-center gap-1">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                                                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                                                                                </svg>
+                                                                                {task.total_focus_time_minutes}m focused
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {expandedPeerId === connection.id && (!connection.tasks || connection.tasks.length === 0) && (
+                                                <div className="mt-4 text-center py-6 border-t">
+                                                    <p className="text-sm text-muted-foreground">No tasks yet</p>
+                                                </div>
+                                            )}
                                         </div>
                                         <Button
                                             variant="ghost"
