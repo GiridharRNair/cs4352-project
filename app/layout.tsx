@@ -9,8 +9,8 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
     metadataBase: new URL(defaultUrl),
-    title: "WindDown - Simple Task Management",
-    description: "Manage your tasks and wind down your day with clarity",
+    title: "WindDown",
+    description: "Screen-time transition app",
 };
 
 const geistSans = Geist({

@@ -1,32 +1,44 @@
-Team Members and Contributions
+# Team Members and Contributions
 
-Giridhar Nair
-- Set up the entire project structure with Next.js and Supabase
-- Implemented Google OAuth authentication
-- Designed and built the database schema (users, tasks, peer connections)
-- Created the landing page and dashboard UI
-- Built the task management system (add, complete, delete tasks)
-- Implemented streak tracking feature
-- Set up theme switching (dark/light mode)
-- Made the site responsive for mobile and desktop
-- Handled deployment configuration
+## Giridhar Nair
 
-Ethan Na
-- Helped style components using Tailwind CSS
-- Tested the UI on different screen sizes
-- Added icons throughout the interface
-- Provided feedback on user experience
-- Tested cross-browser compatibility
+**Contributions:**
+- Present during final demo presentation
 
-Eshaan Gulia
-- Tested database queries and data flow
-- Helped validate API endpoints
-- Tested authentication workflows
-- Checked form validation and error messages
+**UI-Level Contributions:**
+- Complete UI/UX design and implementation for all pages and components
+- Landing page, authentication pages, and main dashboard with three-tab interface
+- Task management interface with edit/delete dialogs, confirmation modals, and Focus Timer
+- Peer connections interface with PIN search, activity feed, emoji reactions, and leaderboard
+- Daily reflection form with mood selection and peer reflections view
+- Status indicators, dark/light theme, and responsive design
+- Component styling with Tailwind CSS and Radix UI
 
-Subramanian Kasi
-- Performed end-to-end testing of the app
-- Tested the complete user flow from login to task management
-- Verified streak calculations
-- Tested peer connection features
-- Checked theme persistence
+**Technical Contributions:**
+- Full-stack implementation with Next.js, React, TypeScript, and Supabase
+- Database design, Google OAuth, real-time subscriptions, and deployment
+- Documentation and testing
+
+---
+
+## Ethan Na
+
+**Contributions:**
+- Present during final demo presentation
+- No UI-level contributions to the final implementation
+
+---
+
+## Eshaan Gulia
+
+**Contributions:**
+- Present during final demo presentation
+- No UI-level contributions to the final implementation
+
+---
+
+## Subramanian Kasi
+
+**Contributions:**
+- Present during final demo presentation
+- No UI-level contributions to the final implementation
