@@ -35,6 +35,7 @@ export function DailyReflectionForm({ userId }: DailyReflectionFormProps) {
 
     useEffect(() => {
         fetchTodayData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userId]);
 
     const fetchTodayData = async () => {

@@ -339,7 +339,7 @@ export function PeerConnections({ userId }: PeerConnectionsProps) {
                         <div className="text-sm">
                             <p className="font-medium mb-1">About Peer Connections</p>
                             <p className="text-muted-foreground">
-                                Connect with friends using their 6-digit PIN to view each other's task completion progress and streaks. Stay motivated together!
+                                Connect with friends using their 6-digit PIN to view each other&apos;s task completion progress and streaks. Stay motivated together!
                             </p>
                         </div>
                     </div>

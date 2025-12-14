@@ -28,6 +28,7 @@ export function PeerReflections({ userId }: PeerReflectionsProps) {
 
     useEffect(() => {
         fetchPeerReflections();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userId]);
 
     const fetchPeerReflections = async () => {
